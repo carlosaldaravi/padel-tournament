@@ -1,0 +1,72 @@
+.card {
+  width: fit-content;
+  height: 14rem;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid white;
+  border-radius: 5%;
+}
+
+/* left line in card */
+.card::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: -1.6rem;
+  height: 1px;
+  width: 25px;
+  background-color: white;
+  transform: translateY(-50%);
+}
+
+/* right line card */
+.card::after {
+  content: "";
+  z-index: 5;
+  position: absolute;
+  top: 50%;
+  right: -2.6rem;
+  width: 2.6rem;
+  background-color: transparent;
+  border: 1px solid white;
+  border-left: 0;
+}
+
+/* hide last child right line */
+.card:last-child::after {
+  display: none;
+}
+
+/* right line only in even cards */
+.card:nth-child(even)::after {
+  width: 0;
+  border: 0;
+}
+/* first round doesn't have left line */
+.round1 > *::before {
+  height: 0;
+}
+
+/* right line height of each round */
+.round1 > *::after {
+  content: "";
+  position: absolute;
+  height: 102% !important;
+}
+.round2 > *::after {
+  content: "";
+  position: absolute;
+  height: 206% !important;
+}
+.round3 > *::after {
+  content: "";
+  position: absolute;
+  height: 408% !important;
+}
+.round4 > *::after {
+  content: "";
+  position: absolute;
+  height: 818% !important;
+}

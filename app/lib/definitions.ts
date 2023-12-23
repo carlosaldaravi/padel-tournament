@@ -52,3 +52,36 @@ export type PlayerForm = {
   user: UserForm;
   category: Category;
 };
+
+export type Game = {
+  id: string;
+  date: Date;
+  court: string;
+  result: string | null;
+  locals: string[];
+  opponents: string[];
+  winners: "locals" | "opponents" | null;
+};
+
+export enum StageEnum {
+  FINAL = "1",
+  SEMIS = "2",
+  QUARTERS = "4",
+  EIGHTHS = "8",
+  SIXTEENTHS = "16",
+  THIRTIETHS = "32",
+}
+
+export type PhaseType = {
+  name: PhaseEnum;
+  games: StageEnum;
+};
+
+export enum PhaseEnum {
+  FINAL = "final",
+  SEMIS = "semis",
+  QUARTERS = "cuartos",
+  EIGHTHS = "octavos",
+  SIXTEENTHS = "dieciseisavos",
+  THIRTIETHS = "treintaidosavos",
+}

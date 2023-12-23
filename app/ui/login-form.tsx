@@ -10,6 +10,7 @@ import { ArrowRightIcon } from "@heroicons/react/20/solid";
 import { Button } from "@/app/ui/button";
 import { useFormState, useFormStatus } from "react-dom";
 import { authenticate } from "@/app/lib/actions";
+import Link from "next/link";
 
 export default function LoginForm() {
   const [errorMessage, dispatch] = useFormState(authenticate, undefined);
@@ -61,18 +62,31 @@ export default function LoginForm() {
             </div>
           </div>
         </div>
-        <LoginButton />
-        <div
-          className="flex h-8 items-end space-x-1"
-          aria-live="polite"
-          aria-atomic="true"
-        >
+        <div className="mt-4 flex flex-col gap-1">
+          <LoginButton />
           {errorMessage && (
-            <>
-              <ExclamationCircleIcon className="h-5 w-5 text-red-500" />
-              <p className="text-sm text-red-500">{errorMessage}</p>
-            </>
+            <div
+              className="flex h-8 items-end space-x-1"
+              aria-live="polite"
+              aria-atomic="true"
+            >
+              <>
+                <ExclamationCircleIcon className="h-5 w-5 text-red-500" />
+                <p className="text-sm text-red-500">{errorMessage}</p>
+              </>
+            </div>
           )}
+          <Link href={"/player/create"}>
+            <button
+              type="button"
+              className="w-full block rounded-md bg-blue-500 px-3 py-2 text-center
+            text-sm font-semibold text-white shadow-sm hover:bg-blue-400
+            focus-visible:outline focus-visible:outline-2
+            focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+            >
+              Registrarme en torneo
+            </button>
+          </Link>
         </div>
       </div>
     </form>
@@ -83,8 +97,8 @@ function LoginButton() {
   const { pending } = useFormStatus();
 
   return (
-    <Button className="mt-4 w-full" aria-disabled={pending}>
-      Entrar <ArrowRightIcon className="ml-auto h-5 w-5 text-gray-50" />
+    <Button className="w-full flex justify-center gap-4" aria-disabled={pending}>
+      Entrar <ArrowRightIcon className="h-5 w-5 text-gray-50" />
     </Button>
   );
 }
