@@ -11,14 +11,7 @@ import {
 } from "@/app/database/db";
 import { AuthError } from "next-auth";
 import { signIn } from "@/auth";
-import {
-  Match,
-  PhaseEnum,
-  StageEnum,
-  StageValue,
-  TournamentType,
-  ValidStageKey,
-} from "./definitions";
+import { TournamentType } from "./definitions";
 
 const PlayerFormSchema = z.object({
   id: z.string(),

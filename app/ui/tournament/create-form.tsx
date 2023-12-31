@@ -4,7 +4,7 @@ import Link from "next/link";
 import { SubmitButton } from "../submit-button";
 import { createTournament } from "@/app/lib/actions";
 import { useFormState } from "react-dom";
-import { Category, PhaseEnum } from "@/app/lib/definitions";
+import { CategoryType, PhaseEnum } from "@/app/lib/definitions";
 import { useEffect, useState } from "react";
 import TogleWithIcon from "../togle-with-icon";
 
@@ -15,7 +15,7 @@ export interface FormCategory {
   initialPhase?: number;
 }
 
-export default function Form({ categories }: { categories: Category[] }) {
+export default function Form({ categories }: { categories: CategoryType[] }) {
   const [formData, setFormData] = useState<FormCategory[]>([]);
   const initialState = { message: null, errors: {} };
   const [state, dispatch] = useFormState(createTournament, initialState);

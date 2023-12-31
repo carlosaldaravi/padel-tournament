@@ -1,9 +1,9 @@
-import { Match } from "@/app/lib/definitions";
+import { MatchType } from "@/app/lib/definitions";
 import GameCouple from "./game-couple";
 import GameInfo from "./game-info";
 import classes from "./game-card.module.css";
 
-const GameCard = ({ match }: { match: Match }) => {
+const GameCard = ({ match }: { match: MatchType }) => {
   return (
     <div className={`${classes.card} `}>
       <GameInfo court={match.court} date={match.date} />

@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
-import { Category } from "@/app/lib/definitions";
+import { CategoryType } from "@/app/lib/definitions";
 import { CreatePlayer } from "../ui/players/buttons";
 
 const PlayerTable = ({
@@ -10,7 +10,7 @@ const PlayerTable = ({
   children,
 }: {
   categoryIdSelected: number;
-  categories: Category[];
+  categories: CategoryType[];
   children: React.ReactNode;
 }) => {
   const router = useRouter();

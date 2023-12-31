@@ -2,14 +2,14 @@
 import { Pool } from "pg";
 import { v4 as uuidv4 } from "uuid";
 import {
-  Category,
-  Club,
-  Match,
-  Player,
+  CategoryType,
+  ClubType,
+  MatchType,
+  PlayerType,
   PlayerForm,
   TournamentType,
   User,
-  UserCredentials,
+  UserCredentialsType,
 } from "@/app/lib/definitions";
 
 const pool = new Pool({
@@ -19,7 +19,7 @@ const pool = new Pool({
   },
 });
 
-export const getClub = async (): Promise<Club> => {
+export const getClub = async (): Promise<ClubType> => {
   const client = await pool.connect();
 
   try {
@@ -31,7 +31,7 @@ export const getClub = async (): Promise<Club> => {
   }
 };
 
-export const getCategories = async (): Promise<Category[]> => {
+export const getCategories = async (): Promise<CategoryType[]> => {
   const client = await pool.connect();
 
   try {
@@ -58,7 +58,7 @@ export const getUserById = async (id: string): Promise<User> => {
 };
 export const getUserByEmail = async (
   email: string
-): Promise<UserCredentials> => {
+): Promise<UserCredentialsType> => {
   const client = await pool.connect();
 
   try {
@@ -72,7 +72,7 @@ export const getUserByEmail = async (
   }
 };
 
-export const getPlayerById = async (id: string): Promise<Player> => {
+export const getPlayerById = async (id: string): Promise<PlayerType> => {
   const client = await pool.connect();
 
   try {
@@ -81,7 +81,7 @@ export const getPlayerById = async (id: string): Promise<Player> => {
       [id]
     );
 
-    const players: Player[] = result.rows.map((player) => {
+    const players: PlayerType[] = result.rows.map((player) => {
       return {
         id: player.id.toString(),
         firstName: player.first_name,
@@ -116,7 +116,7 @@ export const getPlayersByCategory = async (categoryId: number) => {
       [categoryId]
     );
 
-    const players: Player[] = result.rows.map((player) => {
+    const players: PlayerType[] = result.rows.map((player) => {
       return {
         id: player.id.toString(),
         firstName: player.first_name,
@@ -141,7 +141,7 @@ export const getPlayersByCategory = async (categoryId: number) => {
   }
 };
 
-export const addPlayerToDB = async (playerData: Player) => {
+export const addPlayerToDB = async (playerData: PlayerType) => {
   const client = await pool.connect();
 
   try {
@@ -228,8 +228,8 @@ export const addTournamentToDB = async (
   tournamentData: Partial<TournamentType>
 ) => {
   const client = await pool.connect();
-  console.log('tournamentData: ', tournamentData);
-  
+  console.log("tournamentData: ", tournamentData);
+
   try {
     const tournamentResult = await client.query(
       'INSERT INTO "tournament" (id, date, location) VALUES ($1, $2, $3) RETURNING *',
@@ -340,7 +340,7 @@ export const getTournament = async (
             (c) => c.id === row.category_id
           );
         }
-        const match: Match = {
+        const match: MatchType = {
           id: row.match_id,
           court: row.match_court,
           date: row.match_date,

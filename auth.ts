@@ -1,12 +1,12 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { z } from "zod";
-import type { User, UserCredentials } from "@/app/lib/definitions";
+import type { User, UserCredentialsType } from "@/app/lib/definitions";
 import { authConfig } from "./auth.config";
 import { getUserByEmail } from "./app/database/db";
 import * as bcrypt from "bcrypt";
 
-async function getUser(email: string): Promise<UserCredentials | undefined> {
+async function getUser(email: string): Promise<UserCredentialsType | undefined> {
   try {
     const user = await getUserByEmail(email);
     return user;

@@ -1,7 +1,7 @@
 "use client";
 
 import { SubmitButton } from "../submit-button";
-import { Category, PlayerForm } from "@/app/lib/definitions";
+import { CategoryType, PlayerForm } from "@/app/lib/definitions";
 import { updatePlayer } from "@/app/lib/actions";
 import { useFormState } from "react-dom";
 import { useRouter } from "next/navigation";
@@ -11,7 +11,7 @@ const EditPlayerForm = ({
   categories,
 }: {
   player: PlayerForm;
-  categories: Category[];
+  categories: CategoryType[];
 }) => {
   const initialState = { message: null, errors: {} };
   const updatePlayerWithId = updatePlayer.bind(null, player.id);

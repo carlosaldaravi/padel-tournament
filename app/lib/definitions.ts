@@ -1,17 +1,13 @@
-export type Club = {
+export type ClubType = {
   id: string;
   name: string;
 };
-export type Category = {
+export type CategoryType = {
   id: string;
   name?: string;
 };
-export type CategoryField = {
-  id: string;
-  name: string;
-};
 
-export type Player = {
+export type PlayerType = {
   id?: string;
   firstName: string;
   lastName: string;
@@ -20,10 +16,10 @@ export type Player = {
   phone: string;
   comments: string;
   user: User;
-  category: Category;
+  category: CategoryType;
 };
 
-export type UserCredentials = {
+export type UserCredentialsType = {
   id: string;
   email: string;
   password: string;
@@ -50,32 +46,32 @@ export type PlayerForm = {
   phone: string;
   comments: string;
   user: UserForm;
-  category: Category;
+  category: CategoryType;
+};
+
+export type StageType = {
+  id: string;
+  phase: number;
+  matches: MatchType[];
+};
+
+export type CategoryOfTournamentType = {
+  id: string;
+  initialPhase: number;
+  name?: string;
+  stages: StageType[];
+  winners: string[];
 };
 
 export type TournamentType = {
   id: string;
-  categories: [
-    {
-      id: string;
-      initialPhase: number;
-      name?: string;
-      stages: [
-        {
-          id: string;
-          phase: number;
-          matches: Match[];
-        }
-      ];
-      winners: string[];
-    }
-  ];
+  categories: CategoryOfTournamentType[];
   date?: Date;
   place?: string;
   location?: string;
 };
 
-export type Match = {
+export type MatchType = {
   id: string | null;
   date: Date | undefined;
   court: string;
@@ -86,20 +82,6 @@ export type Match = {
   phase: number | null;
 };
 
-export enum StageEnum {
-  final = 1,
-  semis = 2,
-  cuartos = 4,
-  octavos = 8,
-  dieciseisavos = 16,
-  treintaidosavos = 32,
-}
-
-export type PhaseType = {
-  name: PhaseEnum;
-  games: StageEnum;
-};
-
 export enum PhaseEnum {
   FINAL = "final",
   SEMIS = "semis",
@@ -107,15 +89,6 @@ export enum PhaseEnum {
   EIGHTHS = "octavos",
   SIXTEENTHS = "dieciseisavos",
   THIRTIETHS = "treintaidosavos",
-}
-
-export enum PhaseOrder {
-  FINAL = 1,
-  SEMIS = 2,
-  QUARTERS = 3,
-  EIGHTHS = 4,
-  SIXTEENTHS = 5,
-  THIRTIETHS = 6,
 }
 
 export const StageValue = {

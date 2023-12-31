@@ -1,10 +1,10 @@
 import Link from "next/link";
 import Page from "./ui/Page";
 import { getClub } from "./database/db";
-import { Club } from "./lib/definitions";
+import { ClubType } from "./lib/definitions";
 
 export default async function Home() {
-  const club: Club = await getClub();
+  const club: ClubType = await getClub();
   return (
     <main className="flex min-h-screen flex-col items-center justify-between">
       <Page title={`Bienvenido a ${club.name}`}>

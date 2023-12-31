@@ -4,10 +4,10 @@ import Link from "next/link";
 import { SubmitButton } from "../submit-button";
 import { createPlayer } from "@/app/lib/actions";
 import { useFormState } from "react-dom";
-import { Category } from "@/app/lib/definitions";
+import { CategoryType } from "@/app/lib/definitions";
 import { useSearchParams } from "next/navigation";
 
-export default function Form({ categories }: { categories: Category[] }) {
+export default function Form({ categories }: { categories: CategoryType[] }) {
   const searchParams = useSearchParams();
   const initialState = { message: null, errors: {} };
   const [state, dispatch] = useFormState(createPlayer, initialState);

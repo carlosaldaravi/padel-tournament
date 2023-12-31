@@ -1,4 +1,4 @@
-import { Match, StageValue, ValidStageKey } from "@/app/lib/definitions";
+import { MatchType, StageValue, ValidStageKey } from "@/app/lib/definitions";
 import GameCard from "./game-card";
 import classes from "./game-card.module.css";
 
@@ -7,7 +7,7 @@ const Stage = ({
   phase,
   round,
 }: {
-  matches: Match[];
+  matches: MatchType[];
   phase: number;
   round: string;
 }) => {
@@ -22,7 +22,7 @@ const Stage = ({
         } ${classes["round" + round]}`}
       >
         {matches.map((match) => (
-          <GameCard key={match.id} match={match as Match} />
+          <GameCard key={match.id} match={match as MatchType} />
         ))}
       </div>
     </div>
