@@ -1,21 +1,21 @@
-import { Game } from "@/app/lib/definitions";
+import { Match } from "@/app/lib/definitions";
 import GameCouple from "./game-couple";
 import GameInfo from "./game-info";
 import classes from "./game-card.module.css";
 
-const GameCard = ({ game }: { game: Game }) => {
+const GameCard = ({ match }: { match: Match }) => {
   return (
     <div className={`${classes.card} `}>
-      <GameInfo court={game.court} date={game.date} />
+      <GameInfo court={match.court} date={match.date} />
       <div className="p-2 flex-grow flex flex-col justify-center items-center gap-2">
         <GameCouple
-          couple={game.locals}
-          areWinners={game.winners === "locals"}
+          couple={match.locals}
+          areWinners={match.winners === "locals"}
         />
-        <div className="font-black text-xl text-yellow-500">{game.result}</div>
+        <div className="font-black text-xl text-yellow-500">{match.result}</div>
         <GameCouple
-          couple={game.opponents}
-          areWinners={game.winners === "opponents"}
+          couple={match.opponents}
+          areWinners={match.winners === "opponents"}
         />
       </div>
     </div>

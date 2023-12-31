@@ -5,13 +5,22 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import {
   addPlayerToDB,
+  addTournamentToDB,
   deletePlayerFromDB,
   editPlayerFromDB,
 } from "@/app/database/db";
 import { AuthError } from "next-auth";
 import { signIn } from "@/auth";
+import {
+  Match,
+  PhaseEnum,
+  StageEnum,
+  StageValue,
+  TournamentType,
+  ValidStageKey,
+} from "./definitions";
 
-const FormSchema = z.object({
+const PlayerFormSchema = z.object({
   id: z.string(),
   userId: z.string(),
   firstName: z.string().min(1, {
@@ -33,8 +42,20 @@ const FormSchema = z.object({
   }),
 });
 
-const CreatePlayer = FormSchema.omit({ id: true, userId: true });
-const UpdatePlayer = FormSchema.omit({ id: true });
+const TournamentFormSchema = z.object({
+  id: z.string(),
+  firstName: z.string().min(1, {
+    message: "Por favor, escribe el nombre.",
+  }),
+  paid: z.boolean(),
+  categoryId: z.string({
+    invalid_type_error: "Por favor, elige una categoría.",
+  }),
+});
+
+const CreatePlayer = PlayerFormSchema.omit({ id: true, userId: true });
+const UpdatePlayer = PlayerFormSchema.omit({ id: true });
+const CreateTournament = TournamentFormSchema.omit({});
 
 export type State = {
   errors?: {
@@ -155,8 +176,6 @@ export async function updatePlayer(
   };
 
   try {
-    console.log("-----");
-
     await editPlayerFromDB(player);
   } catch (error) {
     return { message: "Database Error: Failed to Update Player." };
@@ -195,4 +214,33 @@ export async function authenticate(
     }
     throw error;
   }
+}
+
+export async function createTournament(
+  prevState: State,
+  formData: any
+): Promise<State> {
+  const tournament = {
+    categories: formData
+      .map((item: any) => {
+        if (item.enabled) {
+          return {
+            id: item.id,
+            initialPhase: item.initialPhase,
+          };
+        } else {
+          return null;
+        }
+      })
+      .filter((c: any) => c !== null),
+  } as Partial<TournamentType>;
+  try {
+    const p = await addTournamentToDB(tournament);
+  } catch (error: any) {
+    return {
+      message: "Error en la base de datos: no se ha creado el jugador.",
+    };
+  }
+  revalidatePath(`/tournament/create`);
+  redirect(`/tournament/create`);
 }
