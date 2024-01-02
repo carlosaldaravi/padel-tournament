@@ -305,29 +305,29 @@ export const addCoupleToDB = async (
     const match = await client.query(
       `
       SELECT 
-    DISTINCT tournament_has_matchs.match_id,
-    CASE 
-      WHEN match_players.match_id IS NOT NULL THEN true
-      ELSE false
-    END AS is_in_match_players
-  FROM tournament_has_matchs 
-  LEFT JOIN match_players ON tournament_has_matchs.match_id = match_players.match_id
-  WHERE tournament_id = $1
-  AND category_id = $2
-  AND initial_phase = (
-    SELECT MAX(initial_phase) 
-    FROM tournament_has_matchs 
-    WHERE tournament_id = $1
-    AND category_id = $2
-  )
-  AND NOT EXISTS (
-    SELECT 1
-    FROM match_players
-    WHERE match_id = tournament_has_matchs.match_id
-    GROUP BY match_id
-    HAVING COUNT(*) >= 3
-  )
-  ORDER BY is_in_match_players DESC;
+        DISTINCT tournament_has_matchs.match_id,
+        CASE 
+          WHEN match_players.match_id IS NOT NULL THEN true
+          ELSE false
+        END AS is_in_match_players
+      FROM tournament_has_matchs 
+      LEFT JOIN match_players ON tournament_has_matchs.match_id = match_players.match_id
+      WHERE tournament_id = $1
+      AND category_id = $2
+      AND initial_phase = (
+        SELECT MAX(initial_phase) 
+        FROM tournament_has_matchs 
+        WHERE tournament_id = $1
+        AND category_id = $2
+      )
+      AND NOT EXISTS (
+        SELECT 1
+        FROM match_players
+        WHERE match_id = tournament_has_matchs.match_id
+        GROUP BY match_id
+        HAVING COUNT(*) >= 3
+      )
+      ORDER BY is_in_match_players DESC;
     `,
       [tournamentId, categoryId]
     );
