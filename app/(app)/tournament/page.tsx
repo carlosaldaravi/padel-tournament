@@ -12,7 +12,6 @@ const TournamentPage = async ({
   const tournament: TournamentType = await getTournament(
     searchParams.tournamentId
   );
-  console.log("tournament: ", tournament?.categories[0]);
 
   return (
     <Page title="Cuadro">

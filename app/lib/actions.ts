@@ -48,6 +48,8 @@ const TournamentFormSchema = z.object({
 });
 
 const CoupleFormSchema = z.object({
+  tournamentId: z.string(),
+  categoryId: z.string(),
   player1: z.string(),
   player2: z.string(),
 });
@@ -66,6 +68,7 @@ export type State = {
     phone?: string[];
     comments?: string[];
     categoryId?: string[];
+    tournamentId?: string[];
     email?: string[];
     player1?: string[];
     player2?: string[];
@@ -253,8 +256,12 @@ export async function addCoupleToTournament(
   prevState: State,
   formData: FormData
 ): Promise<State> {
+  let tId = "";
+  let cId = "";
   try {
     const validatedFields = CreateCuople.safeParse({
+      tournamentId: formData.get("tournamentId"),
+      categoryId: formData.get("categoryId"),
       player1: formData.get("player1"),
       player2: formData.get("player2"),
     });
@@ -265,12 +272,19 @@ export async function addCoupleToTournament(
       };
     }
 
-    const { player1, player2 } = validatedFields.data;
-    const response = await addCoupleToDB(player1, player2);
+    const { tournamentId, categoryId, player1, player2 } = validatedFields.data;
+    tId = tournamentId!;
+    cId = categoryId!;
+    const response = await addCoupleToDB(
+      tournamentId,
+      categoryId,
+      player1,
+      player2
+    );
     console.log("response: ", response);
   } catch (error) {
     return { message: "Database Error: Failed to Delete Player." };
   }
-  revalidatePath(`/tournament`);
-  redirect(`/tournament`);
+  revalidatePath(`/tournament?tournamentId=${tId}&categoryId=${cId}`);
+  redirect(`/tournament?tournamentId=${tId}&categoryId=${cId}`);
 }

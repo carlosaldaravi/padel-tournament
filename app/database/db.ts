@@ -112,7 +112,19 @@ export const getPlayersByCategory = async (categoryId: string) => {
 
   try {
     const result = await client.query(
-      'SELECT p.*, u.email, u.id as user_id FROM "player" p LEFT JOIN "user" u ON p.user_id = u.id WHERE p.category_id = $1 ORDER BY p.first_name',
+      `
+      SELECT 
+        DISTINCT ON (p.id) p.*, u.email, u.id as user_id 
+      FROM "player" p 
+      LEFT JOIN "user" u ON p.user_id = u.id
+      WHERE p.category_id = $1
+      AND NOT EXISTS (
+        SELECT 1
+        FROM match_players
+        WHERE player_id = p.id
+      )
+      ORDER BY p.id, p.first_name;
+      `,
       [categoryId]
     );
 
@@ -282,17 +294,53 @@ export const addMatchToDb = async (
   }
 };
 
-export const addCoupleToDB = async (player1: string, player2: string) => {
+export const addCoupleToDB = async (
+  tournamentId: string,
+  categoryId: string,
+  player1: string,
+  player2: string
+) => {
   const client = await pool.connect();
   try {
-    const matchId = "4cc059a3-320c-4db5-93da-278ce0a6da9c";
+    const match = await client.query(
+      `
+      SELECT 
+    DISTINCT tournament_has_matchs.match_id,
+    CASE 
+      WHEN match_players.match_id IS NOT NULL THEN true
+      ELSE false
+    END AS is_in_match_players
+  FROM tournament_has_matchs 
+  LEFT JOIN match_players ON tournament_has_matchs.match_id = match_players.match_id
+  WHERE tournament_id = $1
+  AND category_id = $2
+  AND initial_phase = (
+    SELECT MAX(initial_phase) 
+    FROM tournament_has_matchs 
+    WHERE tournament_id = $1
+    AND category_id = $2
+  )
+  AND NOT EXISTS (
+    SELECT 1
+    FROM match_players
+    WHERE match_id = tournament_has_matchs.match_id
+    GROUP BY match_id
+    HAVING COUNT(*) >= 3
+  )
+  ORDER BY is_in_match_players DESC;
+    `,
+      [tournamentId, categoryId]
+    );
+    const matchId = match.rows[0].match_id;
+    const isOpponent = match.rows[0].is_in_match_players;
+
     const result = await client.query(
-      'INSERT INTO "match_players" (id, match_id, player_id) VALUES ($1, $2, $3) RETURNING id',
-      [uuidv4(), matchId, player1]
+      'INSERT INTO "match_players" (id, match_id, player_id, is_opponent) VALUES ($1, $2, $3, $4) RETURNING id',
+      [uuidv4(), matchId, player1, isOpponent]
     );
     const result2 = await client.query(
-      'INSERT INTO "match_players" (id, match_id, player_id) VALUES ($1, $2, $3) RETURNING id',
-      [uuidv4(), matchId, player2]
+      'INSERT INTO "match_players" (id, match_id, player_id, is_opponent) VALUES ($1, $2, $3, $4) RETURNING id',
+      [uuidv4(), matchId, player2, isOpponent]
     );
   } catch (error) {
     console.log("error: ", error);
@@ -338,8 +386,6 @@ export const getTournament = async (
     let locals = [];
     let opponents = [];
     for (const row of result.rows) {
-      console.log("row: ", row);
-
       if (!currentTournament || currentTournament.id !== row.tournament_id) {
         currentTournament = {
           id: row.tournament_id,

@@ -11,7 +11,11 @@ const CreateTournamentCouple = async ({
 
   return (
     <Page title="Añadir pareja">
-      <CreateCoupleForm players={players} />
+      <CreateCoupleForm
+        tournamentId={searchParams.tournamentId}
+        categoryId={searchParams.categoryId}
+        players={players}
+      />
     </Page>
   );
 };

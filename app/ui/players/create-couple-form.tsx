@@ -7,8 +7,12 @@ import { useFormState } from "react-dom";
 import { PlayerType } from "@/app/lib/definitions";
 
 export default function CreateCoupleForm({
+  tournamentId,
+  categoryId,
   players,
 }: {
+  tournamentId: string;
+  categoryId: string;
   players: PlayerType[];
 }) {
   const initialState = { message: null, errors: {} };
@@ -16,6 +20,8 @@ export default function CreateCoupleForm({
 
   return (
     <form action={dispatch}>
+      <input type="hidden" name="tournamentId" value={tournamentId} />
+      <input type="hidden" name="categoryId" value={categoryId} />
       <div>
         <label>Nombre 1</label>
         <select
