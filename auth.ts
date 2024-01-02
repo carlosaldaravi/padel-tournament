@@ -1,7 +1,7 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { z } from "zod";
-import type { User, UserCredentialsType } from "@/app/lib/definitions";
+import type { UserType, UserCredentialsType } from "@/app/lib/definitions";
 import { authConfig } from "./auth.config";
 import { getUserByEmail } from "./app/database/db";
 import * as bcrypt from "bcrypt";

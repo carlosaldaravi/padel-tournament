@@ -15,7 +15,7 @@ export type PlayerType = {
   paid: boolean;
   phone: string;
   comments: string;
-  user: User;
+  user: UserType;
   category: CategoryType;
 };
 
@@ -24,7 +24,7 @@ export type UserCredentialsType = {
   email: string;
   password: string;
 };
-export type User = {
+export type UserType = {
   id?: string;
   email: string;
   password?: string;
@@ -66,7 +66,8 @@ export type CategoryOfTournamentType = {
 export type TournamentType = {
   id: string;
   categories: CategoryOfTournamentType[];
-  date?: Date;
+  startAt?: Date;
+  endAt?: Date;
   place?: string;
   location?: string;
 };

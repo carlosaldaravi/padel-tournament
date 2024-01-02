@@ -20,6 +20,7 @@
   width: 25px;
   background-color: white;
   transform: translateY(-50%);
+  opacity: 25%;
 }
 
 /* right line card */
@@ -33,6 +34,7 @@
   background-color: transparent;
   border: 1px solid white;
   border-left: 0;
+  opacity: 25%;
 }
 
 /* hide last child right line */
@@ -54,20 +56,25 @@
 .round1 > *::after {
   content: "";
   position: absolute;
-  height: 102% !important;
+  height: 110% !important;
 }
 .round2 > *::after {
   content: "";
   position: absolute;
-  height: 206% !important;
+  height: 212% !important;
 }
 .round3 > *::after {
   content: "";
   position: absolute;
-  height: 408% !important;
+  height: 423% !important;
 }
 .round4 > *::after {
   content: "";
   position: absolute;
   height: 818% !important;
+}
+.round5 > *::after {
+  content: "";
+  position: absolute;
+  height: 1635% !important;
 }

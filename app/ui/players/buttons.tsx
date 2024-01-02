@@ -5,7 +5,7 @@ import { deletePlayer } from "@/app/lib/actions";
 export function CreatePlayer({
   categoryIdSelected,
 }: {
-  categoryIdSelected: number;
+  categoryIdSelected: string;
 }) {
   return (
     <Link
@@ -17,7 +17,7 @@ export function CreatePlayer({
   );
 }
 
-export function UpdatePlayer({ id }: { id: number }) {
+export function UpdatePlayer({ id }: { id: string }) {
   return (
     <Link
       href={`/player/${id}/edit`}
@@ -28,7 +28,7 @@ export function UpdatePlayer({ id }: { id: number }) {
   );
 }
 
-export function DeletePlayer({ id }: { id: number }) {
+export function DeletePlayer({ id }: { id: string }) {
   const deletePlayerWithId = deletePlayer.bind(null, id);
 
   return (

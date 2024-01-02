@@ -4,6 +4,7 @@ import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import {
+  addCoupleToDB,
   addPlayerToDB,
   addTournamentToDB,
   deletePlayerFromDB,
@@ -11,7 +12,7 @@ import {
 } from "@/app/database/db";
 import { AuthError } from "next-auth";
 import { signIn } from "@/auth";
-import { TournamentType } from "./definitions";
+import { CategoryOfTournamentType, TournamentType } from "./definitions";
 
 const PlayerFormSchema = z.object({
   id: z.string(),
@@ -46,9 +47,15 @@ const TournamentFormSchema = z.object({
   }),
 });
 
+const CoupleFormSchema = z.object({
+  player1: z.string(),
+  player2: z.string(),
+});
+
 const CreatePlayer = PlayerFormSchema.omit({ id: true, userId: true });
 const UpdatePlayer = PlayerFormSchema.omit({ id: true });
 const CreateTournament = TournamentFormSchema.omit({});
+const CreateCuople = CoupleFormSchema.omit({});
 
 export type State = {
   errors?: {
@@ -60,6 +67,8 @@ export type State = {
     comments?: string[];
     categoryId?: string[];
     email?: string[];
+    player1?: string[];
+    player2?: string[];
   };
   message?: string | null;
 };
@@ -225,15 +234,43 @@ export async function createTournament(
           return null;
         }
       })
-      .filter((c: any) => c !== null),
+      .filter((c: CategoryOfTournamentType) => c !== null),
   } as Partial<TournamentType>;
+  let tournamentId = "";
   try {
-    const p = await addTournamentToDB(tournament);
+    const response = await addTournamentToDB(tournament);
+    tournamentId = response.id;
   } catch (error: any) {
     return {
       message: "Error en la base de datos: no se ha creado el jugador.",
     };
   }
-  revalidatePath(`/tournament/create`);
-  redirect(`/tournament/create`);
+  revalidatePath(`/tournament?tournamentId=${tournamentId}`);
+  redirect(`/tournament?tournamentId=${tournamentId}`);
+}
+
+export async function addCoupleToTournament(
+  prevState: State,
+  formData: FormData
+): Promise<State> {
+  try {
+    const validatedFields = CreateCuople.safeParse({
+      player1: formData.get("player1"),
+      player2: formData.get("player2"),
+    });
+    if (!validatedFields.success) {
+      return {
+        errors: validatedFields.error.flatten().fieldErrors,
+        message: "Completa los campos obligatorios.",
+      };
+    }
+
+    const { player1, player2 } = validatedFields.data;
+    const response = await addCoupleToDB(player1, player2);
+    console.log("response: ", response);
+  } catch (error) {
+    return { message: "Database Error: Failed to Delete Player." };
+  }
+  revalidatePath(`/tournament`);
+  redirect(`/tournament`);
 }

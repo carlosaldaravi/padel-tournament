@@ -3,7 +3,7 @@ import { getPlayersByCategory } from "../database/db";
 import { DeletePlayer, UpdatePlayer } from "@/app/ui/players/buttons";
 import PlayerListSkeleton from "./PlayerListSkeleton";
 
-const PlayerList = async ({ categoryId }: { categoryId: number }) => {
+const PlayerList = async ({ categoryId }: { categoryId: string }) => {
   const players = await getPlayersByCategory(categoryId);
 
   return (
@@ -32,8 +32,8 @@ const PlayerList = async ({ categoryId }: { categoryId: number }) => {
             </span>
           </td>
           <td className="w-22 flex justify-end gap-1 whitespace-nowrap py-5 text-sm font-medium sm:pr-0">
-            <UpdatePlayer id={player.id || 0} />
-            <DeletePlayer id={player.user.id || 0} />
+            <UpdatePlayer id={player.id || ""} />
+            <DeletePlayer id={player.user.id || ""} />
           </td>
         </tr>
       ))}

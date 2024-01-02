@@ -48,12 +48,13 @@ export default function Form({ categories }: { categories: CategoryType[] }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleSubmit = () => {
+  const handleSubmit = (e: any) => {
+    e.preventDefault();
     dispatch(formData as any);
   };
 
   return (
-    <form onSubmit={() => handleSubmit()}>
+    <form onSubmit={(e) => handleSubmit(e)}>
       <div className="flex justify-center items-center sm:block">
         <div className="p-4 border rounded-xl bg-cyan-500 w-fit min-w-80">
           <fieldset>

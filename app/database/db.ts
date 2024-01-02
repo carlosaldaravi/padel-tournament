@@ -8,7 +8,7 @@ import {
   PlayerType,
   PlayerForm,
   TournamentType,
-  User,
+  UserType,
   UserCredentialsType,
 } from "@/app/lib/definitions";
 
@@ -43,7 +43,7 @@ export const getCategories = async (): Promise<CategoryType[]> => {
   }
 };
 
-export const getUserById = async (id: string): Promise<User> => {
+export const getUserById = async (id: string): Promise<UserType> => {
   const client = await pool.connect();
 
   try {
@@ -107,7 +107,7 @@ export const getPlayerById = async (id: string): Promise<PlayerType> => {
   }
 };
 
-export const getPlayersByCategory = async (categoryId: number) => {
+export const getPlayersByCategory = async (categoryId: string) => {
   const client = await pool.connect();
 
   try {
@@ -228,12 +228,11 @@ export const addTournamentToDB = async (
   tournamentData: Partial<TournamentType>
 ) => {
   const client = await pool.connect();
-  console.log("tournamentData: ", tournamentData);
 
   try {
     const tournamentResult = await client.query(
-      'INSERT INTO "tournament" (id, date, location) VALUES ($1, $2, $3) RETURNING *',
-      [uuidv4(), null, null]
+      'INSERT INTO "tournament" (id, club_id) VALUES ($1, $2) RETURNING *',
+      [uuidv4(), "7e2c1561-d9ef-4aa9-84bb-59debfe1f668"]
     );
     const tournamentId = tournamentResult.rows[0].id;
 
@@ -283,6 +282,23 @@ export const addMatchToDb = async (
   }
 };
 
+export const addCoupleToDB = async (player1: string, player2: string) => {
+  const client = await pool.connect();
+  try {
+    const matchId = "4cc059a3-320c-4db5-93da-278ce0a6da9c";
+    const result = await client.query(
+      'INSERT INTO "match_players" (id, match_id, player_id) VALUES ($1, $2, $3) RETURNING id',
+      [uuidv4(), matchId, player1]
+    );
+    const result2 = await client.query(
+      'INSERT INTO "match_players" (id, match_id, player_id) VALUES ($1, $2, $3) RETURNING id',
+      [uuidv4(), matchId, player2]
+    );
+  } catch (error) {
+    console.log("error: ", error);
+  }
+};
+
 export const getTournament = async (
   tournamentId: string
 ): Promise<TournamentType> => {
@@ -293,7 +309,7 @@ export const getTournament = async (
       `
       SELECT 
         t.id AS tournament_id, 
-        t.date AS tournament_date, 
+        t.start_at AS tournament_start_at, 
         t.location AS tournament_location, 
         thm.id AS tournament_has_match_id, 
         thm.initial_phase AS tournament_has_match_initial_phase, 
@@ -303,23 +319,31 @@ export const getTournament = async (
         m.court AS match_court, 
         m.date AS match_date, 
         m.result AS match_result,
-        m.phase AS match_phase
+        m.phase AS match_phase,
+        m.winners AS match_winners,
+        p.first_name AS first_name,
+        mp.is_opponent AS is_opponent
       FROM tournament t
-      LEFT JOIN tournament_has_matchs thm ON t.id = thm.tournament_id
-      LEFT JOIN category c ON thm.category_id = c.id
-      LEFT JOIN match m ON thm.match_id = m.id
+      INNER JOIN tournament_has_matchs thm ON t.id = thm.tournament_id
+      INNER JOIN category c ON thm.category_id = c.id
+      INNER JOIN match m ON thm.match_id = m.id
+      LEFT JOIN match_players mp ON mp.match_id = m.id
+      LEFT JOIN player p ON p.id = mp.player_id
       WHERE t.id = $1
     `,
       [tournamentId]
     );
 
     let currentTournament!: TournamentType;
-
+    let locals = [];
+    let opponents = [];
     for (const row of result.rows) {
+      console.log("row: ", row);
+
       if (!currentTournament || currentTournament.id !== row.tournament_id) {
         currentTournament = {
           id: row.tournament_id,
-          date: row.tournament_date,
+          startAt: row.tournament_start_at,
           location: row.tournament_location,
           categories: [] as any,
         };
@@ -347,10 +371,26 @@ export const getTournament = async (
           result: row.match_result,
           locals: [],
           opponents: [],
-          winners: null,
+          winners: row.match_winners,
           phase: row.match_phase,
         };
-
+        if (row.first_name) {
+          row.is_opponent
+            ? opponents.push({
+                categoryId: row.category_id,
+                name: row.first_name,
+                matchId: row.match_id,
+                phase: row.match_phase,
+                isOpponent: true,
+              })
+            : locals.push({
+                categoryId: row.category_id,
+                name: row.first_name,
+                matchId: row.match_id,
+                phase: row.match_phase,
+                isOpponent: false,
+              });
+        }
         const stage = category?.stages.find((s) => s.phase === match.phase);
 
         if (!stage) {
@@ -360,10 +400,30 @@ export const getTournament = async (
             matches: [match],
           } as any);
         } else {
-          stage.matches.push(match);
+          if (!stage.matches.find((m) => m.id === match.id)) {
+            stage.matches.push(match);
+          }
         }
       }
     }
+    locals.forEach((local: any) => {
+      currentTournament.categories
+        .find((c) => c.id === local.categoryId)
+        ?.stages.find((s) => s.phase === local.phase)
+        ?.matches.find((m) => m.id === local.matchId)
+        ?.locals.push(local.name);
+    });
+    opponents.forEach((local: any) => {
+      currentTournament.categories
+        .find((c) => c.id === local.categoryId)
+        ?.stages.find((s) => s.phase === local.phase)
+        ?.matches.find((m) => m.id === local.matchId)
+        ?.opponents.push(local.name);
+    });
+
+    currentTournament.categories.forEach((c) => {
+      c.stages.sort((b, a) => a.phase - b.phase);
+    });
 
     return currentTournament;
   } finally {

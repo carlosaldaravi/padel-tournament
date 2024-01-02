@@ -9,7 +9,7 @@ const PlayerTable = ({
   categories,
   children,
 }: {
-  categoryIdSelected: number;
+  categoryIdSelected: string;
   categories: CategoryType[];
   children: React.ReactNode;
 }) => {
