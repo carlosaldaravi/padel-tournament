@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
 
 const CategoryTournamentSelect = ({
-  catSelected,
+  catSelected = "",
   tournament,
 }: {
   catSelected: string;
@@ -20,7 +20,7 @@ const CategoryTournamentSelect = ({
   };
 
   return (
-    <div className="mt-2">
+    <div className="">
       <select
         defaultValue={catSelected}
         id="categoryId"
@@ -29,7 +29,7 @@ const CategoryTournamentSelect = ({
         aria-describedby="categoryId-error"
         onChange={(e) => handleCategoryChange(e.target.value)}
       >
-        <option value="" disabled selected>
+        <option value="" disabled>
           Selecciona una categoría
         </option>
         {tournament.categories.map((category) => (

@@ -114,16 +114,25 @@ export const getPlayersByCategory = async (categoryId: string) => {
     const result = await client.query(
       `
       SELECT 
-        DISTINCT ON (p.id) p.*, u.email, u.id as user_id 
+        DISTINCT ON (LEAST(p.id, p.couple_id), GREATEST(p.id, p.couple_id)) p.*, 
+        p2.id AS couple_id,
+        p2.first_name AS couple_first_name,
+        p2.last_name AS couple_last_name,
+        p2.paid AS couple_paid,
+        p2.phone AS couple_phone,
+        u.email,
+        u.id AS user_id 
       FROM "player" p 
       LEFT JOIN "user" u ON p.user_id = u.id
+      LEFT JOIN "player" p2 ON p2.id = p.couple_id
       WHERE p.category_id = $1
       AND NOT EXISTS (
         SELECT 1
         FROM match_players
         WHERE player_id = p.id
       )
-      ORDER BY p.id, p.first_name;
+      ORDER BY LEAST(p.id, p.couple_id), GREATEST(p.id, p.couple_id), p.id, p.first_name;
+
       `,
       [categoryId]
     );
@@ -144,6 +153,13 @@ export const getPlayersByCategory = async (categoryId: string) => {
           id: player.user_id.toString(),
           email: player.email,
         },
+        couple: {
+          id: player.couple_id.toString(),
+          firstName: player.couple_first_name,
+          lastName: player.couple_last_name,
+          paid: player.couple_paid,
+          phone: player.couple_phone,
+        },
       };
     });
 
@@ -159,7 +175,7 @@ export const addPlayerToDB = async (playerData: PlayerType) => {
   try {
     const result = await client.query(
       'INSERT INTO "user" (email, password) VALUES ($1, $2) RETURNING id',
-      [playerData.user.email, "123456"]
+      [playerData.user!.email, "123456"]
     );
 
     if (result) {
@@ -173,7 +189,7 @@ export const addPlayerToDB = async (playerData: PlayerType) => {
           playerData.phone,
           playerData.comments,
           result.rows[0].id,
-          Number(playerData.category.id),
+          playerData.category!.id,
         ]
       );
       return result.rows[0];

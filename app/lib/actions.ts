@@ -256,6 +256,8 @@ export async function addCoupleToTournament(
   prevState: State,
   formData: FormData
 ): Promise<State> {
+  console.log('1');
+  
   let tId = "";
   let cId = "";
   try {
@@ -266,6 +268,8 @@ export async function addCoupleToTournament(
       player2: formData.get("player2"),
     });
     if (!validatedFields.success) {
+      console.log('validatedFields.error.flatten().fieldErrors: ', validatedFields.error.flatten().fieldErrors);
+      
       return {
         errors: validatedFields.error.flatten().fieldErrors,
         message: "Completa los campos obligatorios.",
@@ -275,13 +279,14 @@ export async function addCoupleToTournament(
     const { tournamentId, categoryId, player1, player2 } = validatedFields.data;
     tId = tournamentId!;
     cId = categoryId!;
+    console.log("-> player1: ", player1);
+    console.log("-> player2: ", player2);
     const response = await addCoupleToDB(
       tournamentId,
       categoryId,
       player1,
       player2
     );
-    console.log("response: ", response);
   } catch (error) {
     return { message: "Database Error: Failed to Delete Player." };
   }

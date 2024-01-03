@@ -10,13 +10,14 @@ export type CategoryType = {
 export type PlayerType = {
   id?: string;
   firstName: string;
-  lastName: string;
-  dateBorn?: Date | null;
+  lastName?: string;
   paid: boolean;
   phone: string;
-  comments: string;
-  user: UserType;
-  category: CategoryType;
+  dateBorn?: Date | null;
+  comments?: string;
+  user?: UserType;
+  category?: CategoryType;
+  couple?: PlayerType;
 };
 
 export type UserCredentialsType = {

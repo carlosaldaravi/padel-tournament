@@ -12,16 +12,18 @@ const Tournament = ({
 }) => {
   return (
     <div className="mx-12 h-full w-full">
-      <CategoryTournamentSelect
-        catSelected={categoryId}
-        tournament={tournament}
-      />
-      <Link
-        href={`/tournament/couple/create?tournamentId=${tournament.id}&categoryId=${categoryId}`}
-        className="flex justify-center h-10 items-center rounded-lg bg-blue-600 px-4 font-medium text-white transition-colors hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
-      >
-        Añadir pareja
-      </Link>
+      <div className="flex items-center gap-4">
+        <CategoryTournamentSelect
+          catSelected={categoryId}
+          tournament={tournament}
+        />
+        <Link
+          href={`/tournament/couple/create?tournamentId=${tournament.id}&categoryId=${categoryId}`}
+          className="flex justify-center items-center h-8 rounded-lg bg-blue-600 px-4 font-medium text-white transition-colors hover:bg-blue-500 focus-visible:outline focus-visible:outline-blue-600"
+        >
+          Añadir pareja
+        </Link>
+      </div>
       <div className="h-full w-full p-4 snap-x flex items-center gap-16">
         {tournament.categories
           .find((c) => c.id === categoryId)
