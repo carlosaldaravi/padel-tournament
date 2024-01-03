@@ -154,7 +154,7 @@ export const getPlayersByCategory = async (categoryId: string) => {
           email: player.email,
         },
         couple: {
-          id: player.couple_id.toString(),
+          id: player.couple_id?.toString(),
           firstName: player.couple_first_name,
           lastName: player.couple_last_name,
           paid: player.couple_paid,
@@ -174,14 +174,15 @@ export const addPlayerToDB = async (playerData: PlayerType) => {
 
   try {
     const result = await client.query(
-      'INSERT INTO "user" (email, password) VALUES ($1, $2) RETURNING id',
-      [playerData.user!.email, "123456"]
+      'INSERT INTO "user" (id, email, password) VALUES ($1, $2, $3) RETURNING id',
+      [uuidv4(), playerData.user!.email, "123456"]
     );
 
     if (result) {
       await client.query(
-        'INSERT INTO "player" (first_name, last_name, date_born, paid, phone, comments, user_id, category_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
+        'INSERT INTO "player" (id, first_name, last_name, date_born, paid, phone, comments, user_id, category_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *',
         [
+          uuidv4(),
           playerData.firstName,
           playerData.lastName,
           playerData.dateBorn,

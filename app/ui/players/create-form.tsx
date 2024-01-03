@@ -11,9 +11,10 @@ export default function Form({ categories }: { categories: CategoryType[] }) {
   const searchParams = useSearchParams();
   const initialState = { message: null, errors: {} };
   const [state, dispatch] = useFormState(createPlayer, initialState);
-  const categorySelected = Number(searchParams.get("category")) || 1;
+  const categorySelected = searchParams.get("category") || "";
 
   return (
+    // TODO: add couple input
     <form action={dispatch}>
       <div className="space-y-4">
         <div className="border-b border-white/10 pb-8">
