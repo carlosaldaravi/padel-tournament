@@ -83,7 +83,7 @@ export const getPlayerById = async (id: string): Promise<PlayerType> => {
 
     const players: PlayerType[] = result.rows.map((player) => {
       return {
-        id: player.id.toString(),
+        id: player.id,
         firstName: player.first_name,
         lastName: player.last_name,
         // dateBorn: player.date_born,
@@ -91,11 +91,11 @@ export const getPlayerById = async (id: string): Promise<PlayerType> => {
         phone: player.phone,
         comments: player.comments,
         category: {
-          id: player.category_id.toString(),
+          id: player.category_id,
           name: player.category_name,
         },
         user: {
-          id: player.user_id.toString(),
+          id: player.user_id,
           email: player.email,
         },
       };
@@ -107,7 +107,106 @@ export const getPlayerById = async (id: string): Promise<PlayerType> => {
   }
 };
 
+export const getPlayersByCategoryWithOutCouple = async (
+  categoryId: string
+): Promise<PlayerType[]> => {
+  const client = await pool.connect();
+
+  try {
+    const result = await client.query(
+      `
+        SELECT 
+          p.*, u.email
+        FROM "player" p
+        LEFT JOIN "user" u ON p.user_id = u.id
+        WHERE p.category_id = $1
+        AND p.couple_id IS NULL;
+      `,
+      [categoryId]
+    );
+
+    const players: PlayerType[] = result.rows.map((player) => {
+      return {
+        id: player.id,
+        firstName: player.first_name,
+        lastName: player.last_name,
+        // dateBorn: player.date_born,
+        paid: player.paid,
+        phone: player.phone,
+        comments: player.comments,
+        category: {
+          id: player.category_id,
+          name: player.category_name,
+        },
+        user: {
+          id: player.user_id,
+          email: player.email,
+        },
+      };
+    });
+
+    return players;
+  } finally {
+    client.release();
+  }
+};
+
 export const getPlayersByCategory = async (categoryId: string) => {
+  const client = await pool.connect();
+
+  try {
+    const result = await client.query(
+      `
+      SELECT 
+        p.*, 
+        p2.id AS couple_id,
+        p2.first_name AS couple_first_name,
+        p2.last_name AS couple_last_name,
+        p2.paid AS couple_paid,
+        p2.phone AS couple_phone,
+        u.email,
+        u.id AS user_id 
+      FROM "player" p 
+      LEFT JOIN "user" u ON p.user_id = u.id
+      LEFT JOIN "player" p2 ON p2.id = p.couple_id
+      WHERE p.category_id = $1
+
+      `,
+      [categoryId]
+    );
+
+    const players: PlayerType[] = result.rows.map((player) => {
+      return {
+        id: player.id,
+        firstName: player.first_name,
+        lastName: player.last_name,
+        // dateBorn: player.date_born,
+        paid: player.paid,
+        phone: player.phone,
+        comments: player.comments,
+        category: {
+          id: player.category_id,
+        },
+        user: {
+          id: player.user_id,
+          email: player.email,
+        },
+        couple: {
+          id: player.couple_id,
+          firstName: player.couple_first_name,
+          lastName: player.couple_last_name,
+          paid: player.couple_paid,
+          phone: player.couple_phone,
+        },
+      };
+    });
+
+    return players;
+  } finally {
+    client.release();
+  }
+};
+export const getCouplesByCategory = async (categoryId: string) => {
   const client = await pool.connect();
 
   try {
@@ -139,7 +238,7 @@ export const getPlayersByCategory = async (categoryId: string) => {
 
     const players: PlayerType[] = result.rows.map((player) => {
       return {
-        id: player.id.toString(),
+        id: player.id,
         firstName: player.first_name,
         lastName: player.last_name,
         // dateBorn: player.date_born,
@@ -147,14 +246,14 @@ export const getPlayersByCategory = async (categoryId: string) => {
         phone: player.phone,
         comments: player.comments,
         category: {
-          id: player.category_id.toString(),
+          id: player.category_id,
         },
         user: {
-          id: player.user_id.toString(),
+          id: player.user_id,
           email: player.email,
         },
         couple: {
-          id: player.couple_id?.toString(),
+          id: player.couple_id,
           firstName: player.couple_first_name,
           lastName: player.couple_last_name,
           paid: player.couple_paid,
@@ -169,30 +268,49 @@ export const getPlayersByCategory = async (categoryId: string) => {
   }
 };
 
-export const addPlayerToDB = async (playerData: PlayerType) => {
+export const addPlayerToDB = async (playerData: PlayerForm) => {
   const client = await pool.connect();
 
   try {
+    const userId = uuidv4();
     const result = await client.query(
       'INSERT INTO "user" (id, email, password) VALUES ($1, $2, $3) RETURNING id',
-      [uuidv4(), playerData.user!.email, "123456"]
+      [userId, playerData.user!.email, "123456"]
     );
 
     if (result) {
+      const playerId = uuidv4();
       await client.query(
-        'INSERT INTO "player" (id, first_name, last_name, date_born, paid, phone, comments, user_id, category_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *',
+        `
+          INSERT 
+          INTO "player" (id, first_name, last_name, date_born, paid, phone, comments, user_id, category_id, couple_id)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+          RETURNING *
+        `,
         [
-          uuidv4(),
+          playerId,
           playerData.firstName,
           playerData.lastName,
           playerData.dateBorn,
           playerData.paid,
           playerData.phone,
           playerData.comments,
-          result.rows[0].id,
+          userId,
           playerData.category!.id,
+          playerData.couple?.id,
         ]
       );
+      if (playerData.couple?.id) {
+        await client.query(
+          `
+            UPDATE 
+              "player"
+            SET couple_id = $1
+            WHERE id = $2
+          `,
+          [playerId, playerData.couple.id]
+        );
+      }
       return result.rows[0];
     }
   } catch (error: any) {
@@ -203,15 +321,13 @@ export const addPlayerToDB = async (playerData: PlayerType) => {
 };
 
 export const editPlayerFromDB = async (playerData: PlayerForm) => {
-  console.log("playerData::: ", playerData);
   const client = await pool.connect();
 
   try {
     const result = await client.query(
       'UPDATE "user" SET email = $1 WHERE id = $2',
-      [playerData.user.email, Number(playerData.user.id)]
+      [playerData?.user?.email, playerData?.user?.id]
     );
-    console.log("result: ", result);
 
     if (result) {
       await client.query(
@@ -223,9 +339,9 @@ export const editPlayerFromDB = async (playerData: PlayerForm) => {
           playerData.paid,
           playerData.phone,
           playerData.comments,
-          Number(playerData.user.id),
-          Number(playerData.category.id),
-          Number(playerData.id),
+          playerData.user?.id,
+          playerData.category?.id,
+          playerData.id,
         ]
       );
 
@@ -242,9 +358,7 @@ export const deletePlayerFromDB = async (id: string) => {
   const client = await pool.connect();
 
   try {
-    const result = await client.query('DELETE FROM "user" WHERE id = $1', [
-      Number(id),
-    ]);
+    const result = await client.query('DELETE FROM "user" WHERE id = $1', [id]);
     return result;
   } catch (error) {
     console.log("=> error: ", error);

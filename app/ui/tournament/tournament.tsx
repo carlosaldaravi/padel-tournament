@@ -4,7 +4,7 @@ import CategoryTournamentSelect from "./category-select";
 import Link from "next/link";
 import Modal from "../modal";
 import CreateCoupleForm from "@/app/ui/players/create-couple-form";
-import { getPlayersByCategory } from "@/app/database/db";
+import { getCouplesByCategory } from "@/app/database/db";
 import { Button } from "../button";
 import SVG from "../svg";
 
@@ -15,7 +15,7 @@ const Tournament = async ({
   tournament: TournamentType;
   categoryId: string;
 }) => {
-  const players = await getPlayersByCategory(categoryId);
+  const players = await getCouplesByCategory(categoryId);
   return (
     <div className="mx-12 h-full w-full">
       <div className="flex items-center gap-4">

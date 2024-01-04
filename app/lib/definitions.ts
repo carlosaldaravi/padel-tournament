@@ -39,15 +39,16 @@ export type UserForm = {
 };
 
 export type PlayerForm = {
-  id: string;
-  firstName: string;
-  lastName: string;
+  id?: string;
+  firstName?: string;
+  lastName?: string;
   dateBorn?: Date | null;
-  paid: boolean;
-  phone: string;
-  comments: string;
-  user: UserForm;
-  category: CategoryType;
+  paid?: boolean;
+  phone?: string;
+  comments?: string;
+  user?: UserForm;
+  category?: CategoryType;
+  couple?: Partial<PlayerType>;
 };
 
 export type StageType = {

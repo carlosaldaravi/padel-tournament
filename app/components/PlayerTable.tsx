@@ -17,7 +17,7 @@ const PlayerTable = ({
   const pathname = usePathname();
 
   const handleCategorySelected = (value: string) => {
-    router.replace(`${pathname}?category=${value}`);
+    router.replace(`${pathname}?categoryId=${value}`);
   };
   return (
     <div className="sm:min-w-[32rem]">
@@ -79,6 +79,12 @@ const PlayerTable = ({
                     className="px-2 py-3.5 text-left text-lg font-semibold text-white"
                   >
                     Estado
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-2 py-3.5 text-left text-lg font-semibold text-white"
+                  >
+                    Pareja
                   </th>
                   <th scope="col" className="w-22 py-3.5">
                     <span className="sr-only">Editar</span>

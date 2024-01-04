@@ -4,14 +4,27 @@ import Link from "next/link";
 import { SubmitButton } from "../submit-button";
 import { createPlayer } from "@/app/lib/actions";
 import { useFormState } from "react-dom";
-import { CategoryType } from "@/app/lib/definitions";
-import { useSearchParams } from "next/navigation";
+import { CategoryType, PlayerType } from "@/app/lib/definitions";
+import { usePathname, useSearchParams, useRouter } from "next/navigation";
 
-export default function Form({ categories }: { categories: CategoryType[] }) {
+export default function Form({
+  categories,
+  categorySelected,
+  players,
+}: {
+  categories: CategoryType[];
+  categorySelected: string;
+  players: PlayerType[];
+}) {
   const searchParams = useSearchParams();
   const initialState = { message: null, errors: {} };
   const [state, dispatch] = useFormState(createPlayer, initialState);
-  const categorySelected = searchParams.get("category") || "";
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const handleCategorySelected = (value: string) => {
+    router.replace(`${pathname}?categoryId=${value}`);
+  };
 
   return (
     // TODO: add couple input
@@ -169,6 +182,7 @@ export default function Form({ categories }: { categories: CategoryType[] }) {
                   name="categoryId"
                   className="block w-full p-2 rounded-md border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6 [&_*]:text-black"
                   aria-describedby="categoryId-error"
+                  onChange={(e) => handleCategorySelected(e.target.value)}
                 >
                   <option value="" disabled>
                     Selecciona una categoría
@@ -190,6 +204,39 @@ export default function Form({ categories }: { categories: CategoryType[] }) {
                   aria-atomic="true"
                 >
                   {state.errors.categoryId.map((error: string) => (
+                    <p className="mt-2 text-sm text-red-500" key={error}>
+                      {error}
+                    </p>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="sm:col-span-2">
+              <label
+                htmlFor="coupleId"
+                className="block text-sm font-medium leading-6 text-white"
+              >
+                Pareja
+              </label>
+              <div className="mt-2">
+                <select
+                  defaultValue={categorySelected}
+                  id="coupleId"
+                  name="coupleId"
+                  className="block w-full p-2 rounded-md border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6 [&_*]:text-black"
+                  aria-describedby="coupleId-error"
+                >
+                  <option value="">Selecciona la pareja</option>
+                  {players.map((couple) => (
+                    <option key={`couple-id-${couple.id}`} value={couple.id}>
+                      {couple.firstName} {couple.lastName}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              {state.errors?.coupleId && (
+                <div id="coupleId-error" aria-live="polite" aria-atomic="true">
+                  {state.errors.coupleId.map((error: string) => (
                     <p className="mt-2 text-sm text-red-500" key={error}>
                       {error}
                     </p>
@@ -221,7 +268,7 @@ export default function Form({ categories }: { categories: CategoryType[] }) {
       </div>
       <div className="mt-6 flex items-center justify-end gap-x-6">
         <Link
-          href={`/player`}
+          href={`/player?categoryId=${categorySelected}`}
           className="text-sm font-semibold leading-6 text-white"
         >
           Cancelar

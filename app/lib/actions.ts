@@ -17,6 +17,7 @@ import { CategoryOfTournamentType, TournamentType } from "./definitions";
 const PlayerFormSchema = z.object({
   id: z.string(),
   userId: z.string(),
+  coupleId: z.string(),
   firstName: z.string().min(1, {
     message: "Por favor, escribe el nombre.",
   }),
@@ -72,6 +73,7 @@ export type State = {
     email?: string[];
     player1?: string[];
     player2?: string[];
+    coupleId?: string[];
   };
   message?: string | null;
 };
@@ -87,6 +89,7 @@ export async function createPlayer(
     phone: formData.get("phone"),
     comments: formData.get("comments"),
     categoryId: formData.get("categoryId"),
+    coupleId: formData.get("coupleId"),
     email: formData.get("email"),
   });
 
@@ -97,8 +100,16 @@ export async function createPlayer(
     };
   }
 
-  const { firstName, lastName, paid, phone, comments, email, categoryId } =
-    validatedFields.data;
+  const {
+    firstName,
+    lastName,
+    paid,
+    phone,
+    comments,
+    email,
+    categoryId,
+    coupleId,
+  } = validatedFields.data;
 
   const player = {
     firstName,
@@ -108,6 +119,7 @@ export async function createPlayer(
     comments,
     category: { id: categoryId },
     user: { email },
+    couple: { id: coupleId },
   };
 
   // Insert data into the database
@@ -125,8 +137,8 @@ export async function createPlayer(
     };
   }
   // Revalidate the cache for the invoices page and redirect the user.
-  revalidatePath(`/player?category=${categoryId}`);
-  redirect(`/player?category=${categoryId}`);
+  revalidatePath(`/player?categoryId=${categoryId}`);
+  redirect(`/player?categoryId=${categoryId}`);
 }
 
 export async function updatePlayer(
@@ -186,8 +198,8 @@ export async function updatePlayer(
     return { message: "Database Error: Failed to Update Player." };
   }
 
-  revalidatePath(`/player?category=${categoryId}`);
-  redirect(`/player?category=${categoryId}`);
+  revalidatePath(`/player?categoryId=${categoryId}`);
+  redirect(`/player?categoryId=${categoryId}`);
 }
 
 export async function deletePlayer(id: string) {
@@ -256,8 +268,8 @@ export async function addCoupleToTournament(
   prevState: State,
   formData: FormData
 ): Promise<State> {
-  console.log('1');
-  
+  console.log("1");
+
   let tId = "";
   let cId = "";
   try {
@@ -268,8 +280,11 @@ export async function addCoupleToTournament(
       player2: formData.get("player2"),
     });
     if (!validatedFields.success) {
-      console.log('validatedFields.error.flatten().fieldErrors: ', validatedFields.error.flatten().fieldErrors);
-      
+      console.log(
+        "validatedFields.error.flatten().fieldErrors: ",
+        validatedFields.error.flatten().fieldErrors
+      );
+
       return {
         errors: validatedFields.error.flatten().fieldErrors,
         message: "Completa los campos obligatorios.",

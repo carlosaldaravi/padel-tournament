@@ -19,21 +19,26 @@ const PlayerList = async ({ categoryId }: { categoryId: string }) => {
                 <div className="font-medium text-white">
                   {player.firstName} {player.lastName}
                 </div>
-                <div className="mt-1 text-gray-500">{player.user.email}</div>
+                <div className="mt-1 text-gray-500">{player.user!.email}</div>
               </div>
             </div>
           </td>
-          <td className="whitespace-nowrap px-2 py-5 text-sm text-gray-500">
+          <td className="whitespace-nowrap px-2 py-5 text-sm">
             <div className="text-white">{player.phone}</div>
           </td>
-          <td className="whitespace-nowrap px-2 py-5 text-sm text-gray-500">
+          <td className="whitespace-nowrap px-2 py-5 text-sm">
             <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
               {player.paid ? "Pagado" : "No pagado"}
             </span>
           </td>
+          <td className="whitespace-nowrap px-2 py-5 text-sm">
+            <span className="inline-flex items-center px-2 py-1">
+              {player.couple?.firstName} {player.couple?.lastName}
+            </span>
+          </td>
           <td className="w-22 flex justify-end gap-1 whitespace-nowrap py-5 text-sm font-medium sm:pr-0">
             <UpdatePlayer id={player.id || ""} />
-            <DeletePlayer id={player.user.id || ""} />
+            <DeletePlayer id={player.user!.id || ""} />
           </td>
         </tr>
       ))}

@@ -6,10 +6,10 @@ import { getCategories } from "@/app/database/db";
 const Player = async ({
   searchParams,
 }: {
-  searchParams?: { category: string };
+  searchParams?: { categoryId: string };
 }) => {
   const categories = await getCategories();
-  const category = searchParams?.category || "";
+  const category = searchParams?.categoryId || "";
 
   return (
     <Page title="Lista de jugadores">

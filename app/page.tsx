@@ -8,7 +8,7 @@ export default async function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between">
       <Page title={`Bienvenido a ${club.name}`}>
-        <Link href={`/player?category=1`}>
+        <Link href={`/player?categoryId=d38d958f-ab84-481d-9e8e-2c4f36cce724`}>
           <button
             type="button"
             className="block rounded-md bg-indigo-600 px-3 py-2 text-center

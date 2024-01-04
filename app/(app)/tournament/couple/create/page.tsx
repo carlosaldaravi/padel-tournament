@@ -1,4 +1,4 @@
-import { getPlayersByCategory } from "@/app/database/db";
+import { getCouplesByCategory } from "@/app/database/db";
 import Page from "@/app/ui/Page";
 import CreateCoupleForm from "@/app/ui/players/create-couple-form";
 
@@ -7,7 +7,7 @@ const CreateTournamentCouple = async ({
 }: {
   searchParams: { tournamentId: string; categoryId: string };
 }) => {
-  const players = await getPlayersByCategory(searchParams.categoryId);
+  const players = await getCouplesByCategory(searchParams.categoryId);
 
   return (
     <Page title="Añadir pareja">
