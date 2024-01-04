@@ -23,19 +23,6 @@ const Tournament = async ({
           catSelected={categoryId}
           tournament={tournament}
         />
-        {/* <Link
-          href={`/tournament/couple/create?tournamentId=${tournament.id}&categoryId=${categoryId}`}
-          className="flex justify-center items-center h-8 rounded-lg bg-blue-600 px-4 font-medium text-white transition-colors hover:bg-blue-500 focus-visible:outline focus-visible:outline-blue-600"
-        >
-          Añadir pareja
-        </Link> */}
-        {/* <Modal show={true}>
-          <CreateCoupleForm
-            tournamentId={tournament.id}
-            categoryId={categoryId}
-            players={players}
-          />
-        </Modal> */}
       </div>
       <div className="h-full w-full p-4 snap-x flex items-start gap-16">
         {/* TODO: only show to admin */}

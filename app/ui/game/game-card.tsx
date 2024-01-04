@@ -2,10 +2,12 @@ import { MatchType } from "@/app/lib/definitions";
 import GameCouple from "./game-couple";
 import GameInfo from "./game-info";
 import classes from "./game-card.module.css";
+import Modal from "../modal";
 
 const GameCard = ({ match }: { match: MatchType }) => {
   return (
     <div className={`${classes.card} `}>
+      <Modal match={match} />
       <GameInfo court={match.court} date={match.date} />
       <div className="p-2 flex-grow flex flex-col justify-center items-center gap-2">
         <GameCouple
