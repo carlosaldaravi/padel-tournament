@@ -74,15 +74,20 @@ export type TournamentType = {
   location?: string;
 };
 
+export enum WinnersEnum {
+  LOCALS = "locals",
+  OPPONENTS = "opponents",
+}
+
 export type MatchType = {
-  id: string | null;
+  id: string;
   date: Date | undefined;
   court: string;
-  result: string | null;
+  result: string;
   locals: string[];
   opponents: string[];
-  winners: "locals" | "opponents" | null;
-  phase: number | null;
+  winners: WinnersEnum | null;
+  phase?: number | null;
 };
 
 export enum PhaseEnum {

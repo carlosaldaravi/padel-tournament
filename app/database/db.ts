@@ -425,6 +425,34 @@ export const addMatchToDb = async (
   }
 };
 
+export const editMatchFromDB = async (playerData: Partial<MatchType>) => {
+  const client = await pool.connect();
+
+  try {
+    const result = await client.query(
+      `
+        UPDATE 
+          "match"
+        SET result = $1, court = $2, date = $3, winners = $4
+        WHERE id = $5
+      `,
+      [
+        playerData.result,
+        playerData.court,
+        playerData.date,
+        playerData.winners,
+        playerData.id,
+      ]
+    );
+
+    return result.rows[0];
+  } catch (error) {
+    console.log("=> error: ", error);
+  } finally {
+    client.release();
+  }
+};
+
 export const addCoupleToDB = async (
   tournamentId: string,
   categoryId: string,

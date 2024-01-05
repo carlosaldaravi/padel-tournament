@@ -8,11 +8,17 @@ import {
   addPlayerToDB,
   addTournamentToDB,
   deletePlayerFromDB,
+  editMatchFromDB,
   editPlayerFromDB,
 } from "@/app/database/db";
 import { AuthError } from "next-auth";
 import { signIn } from "@/auth";
-import { CategoryOfTournamentType, TournamentType } from "./definitions";
+import {
+  CategoryOfTournamentType,
+  MatchType,
+  TournamentType,
+  WinnersEnum,
+} from "./definitions";
 
 const PlayerFormSchema = z.object({
   id: z.string(),
@@ -55,10 +61,20 @@ const CoupleFormSchema = z.object({
   player2: z.string(),
 });
 
+const MatchFormSchema = z.object({
+  matchId: z.string(),
+  result: z.string(),
+  court: z.string(),
+  winners: z.string(),
+  date: z.string(),
+  time: z.string(),
+});
+
 const CreatePlayer = PlayerFormSchema.omit({ id: true, userId: true });
 const UpdatePlayer = PlayerFormSchema.omit({ id: true });
 const CreateTournament = TournamentFormSchema.omit({});
 const CreateCuople = CoupleFormSchema.omit({});
+const UpdateMatch = MatchFormSchema.omit({});
 
 export type State = {
   errors?: {
@@ -74,6 +90,11 @@ export type State = {
     player1?: string[];
     player2?: string[];
     coupleId?: string[];
+    matchId?: string[];
+    result?: string[];
+    court?: string[];
+    date?: string[];
+    time?: string[];
   };
   message?: string | null;
 };
@@ -158,17 +179,12 @@ export async function updatePlayer(
     email: formData.get("email"),
     userId: formData.get("userId"),
   });
-  console.log("!");
   if (!validatedFields.success) {
-    console.log("1");
-    console.log("validatedFields: ", validatedFields);
-
     return {
       errors: validatedFields.error.flatten().fieldErrors,
       message: "Faltan campos. No se ha podido actualizar el jugador.",
     };
   }
-  console.log("2");
 
   const {
     firstName,
@@ -200,6 +216,53 @@ export async function updatePlayer(
 
   revalidatePath(`/player?categoryId=${categoryId}`);
   redirect(`/player?categoryId=${categoryId}`);
+}
+export async function updateMatch(
+  prevState: State,
+  formData: FormData
+): Promise<State> {
+  console.log("formData: ", formData);
+  const validatedFields = UpdateMatch.safeParse({
+    matchId: formData.get("matchId"),
+    result: formData.get("result"),
+    court: formData.get("court"),
+    date: formData.get("date"),
+    time: formData.get("time"),
+    winners: formData.get("winners"),
+  });
+
+  if (!validatedFields.success) {
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: "Faltan campos. No se ha podido actualizar el partido.",
+    };
+  }
+
+  const { matchId, result, court, date, time, winners } = validatedFields.data;
+
+  // TODO: type winners
+  const fullDate = new Date(`${date}T${time}`);
+  const timestamp = fullDate.getTime();
+  const match: any = {
+    id: matchId,
+    result,
+    court,
+    date: fullDate,
+    winners,
+  };
+
+  try {
+    await editMatchFromDB(match);
+  } catch (error) {
+    return { message: "Database Error: Failed to Update Match." };
+  }
+
+  revalidatePath(
+    `/tournament?tournamentId=51031936-5ed9-44d2-b9da-ba21e6518062&categoryId=d38d958f-ab84-481d-9e8e-2c4f36cce724`
+  );
+  redirect(
+    `/tournament?tournamentId=51031936-5ed9-44d2-b9da-ba21e6518062&categoryId=d38d958f-ab84-481d-9e8e-2c4f36cce724`
+  );
 }
 
 export async function deletePlayer(id: string) {

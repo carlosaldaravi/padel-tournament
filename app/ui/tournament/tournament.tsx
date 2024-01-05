@@ -2,7 +2,7 @@ import { TournamentType } from "@/app/lib/definitions";
 import Stage from "../game/game-stage";
 import CategoryTournamentSelect from "./category-select";
 import Link from "next/link";
-import Modal from "../modal";
+import Modal from "../modal/modal";
 import CreateCoupleForm from "@/app/ui/players/create-couple-form";
 import { getCouplesByCategory } from "@/app/database/db";
 import { Button } from "../button";

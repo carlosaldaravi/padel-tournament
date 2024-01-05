@@ -7,7 +7,7 @@
   flex-direction: column;
   align-items: center;
   border: 1px solid white;
-  border-radius: 5%;
+  border-radius: .4rem;
 }
 
 /* left line in card */
