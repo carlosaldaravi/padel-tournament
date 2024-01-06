@@ -8,7 +8,7 @@ const GameCouple = ({
   return (
     <div
       className={`w-full flex flex-col justify-center items-center ${
-        areWinners ? "font-bold" : "font-thin"
+        areWinners ? "font-black" : "font-thin"
       }`}
     >
       {couple.length > 0 ? (
@@ -17,7 +17,10 @@ const GameCouple = ({
           <span>{couple[1]}</span>
         </>
       ) : (
-        <span>--</span>
+        <>
+          <span>--</span>
+          <span>--</span>
+        </>
       )}
     </div>
   );

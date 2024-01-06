@@ -18,8 +18,8 @@ const Stage = ({
       </h2>
       <div
         className={`h-full flex flex-col justify-around mt-12 ${
-          classes.cardContainer
-        } ${classes["round" + round]}`}
+          classes["round" + round]
+        }`}
       >
         {matches.map((match) => (
           <GameCard key={match.id} match={match as MatchType} />

@@ -493,16 +493,18 @@ export const addCoupleToDB = async (
     const matchId = match.rows[0].match_id;
     const isOpponent = match.rows[0].is_in_match_players;
 
-    const result = await client.query(
-      'INSERT INTO "match_players" (id, match_id, player_id, is_opponent) VALUES ($1, $2, $3, $4) RETURNING id',
-      [uuidv4(), matchId, player1, isOpponent]
-    );
-    const result2 = await client.query(
-      'INSERT INTO "match_players" (id, match_id, player_id, is_opponent) VALUES ($1, $2, $3, $4) RETURNING id',
-      [uuidv4(), matchId, player2, isOpponent]
-    );
+    for (const player of [player1, player2]) {
+      await client.query(
+        'INSERT INTO "match_players" (id, match_id, player_id, is_opponent) VALUES ($1, $2, $3, $4) RETURNING id',
+        [uuidv4(), matchId, player, isOpponent]
+      );
+    }
   } catch (error) {
     console.log("error: ", error);
+  } finally {
+    console.log("end connection");
+
+    client.release();
   }
 };
 

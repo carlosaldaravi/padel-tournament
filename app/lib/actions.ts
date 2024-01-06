@@ -15,9 +15,8 @@ import { AuthError } from "next-auth";
 import { signIn } from "@/auth";
 import {
   CategoryOfTournamentType,
-  MatchType,
+  PlayerType,
   TournamentType,
-  WinnersEnum,
 } from "./definitions";
 
 const PlayerFormSchema = z.object({
@@ -63,9 +62,9 @@ const CoupleFormSchema = z.object({
 
 const MatchFormSchema = z.object({
   matchId: z.string(),
-  result: z.string(),
+  result: z.string().nullable(),
   court: z.string(),
-  winners: z.string(),
+  winners: z.string().nullable(),
   date: z.string(),
   time: z.string(),
 });
@@ -91,7 +90,6 @@ export type State = {
     player2?: string[];
     coupleId?: string[];
     matchId?: string[];
-    result?: string[];
     court?: string[];
     date?: string[];
     time?: string[];
@@ -242,10 +240,9 @@ export async function updateMatch(
 
   // TODO: type winners
   const fullDate = new Date(`${date}T${time}`);
-  const timestamp = fullDate.getTime();
   const match: any = {
     id: matchId,
-    result,
+    result: result || "--- / --- / ---",
     court,
     date: fullDate,
     winners,
@@ -331,7 +328,7 @@ export async function addCoupleToTournament(
   prevState: State,
   formData: FormData
 ): Promise<State> {
-  console.log("1");
+  console.log("formData: ", formData);
 
   let tId = "";
   let cId = "";
@@ -370,4 +367,24 @@ export async function addCoupleToTournament(
   }
   revalidatePath(`/tournament?tournamentId=${tId}&categoryId=${cId}`);
   redirect(`/tournament?tournamentId=${tId}&categoryId=${cId}`);
+}
+
+export async function assignCoupleToTournament(
+  tournamentId: string,
+  categoryId: string,
+  players: PlayerType[]
+): Promise<void> {
+  for (const player of players) {
+    await addCoupleToDB(
+      tournamentId,
+      categoryId,
+      player.id!,
+      player.couple!.id as string
+    );
+  }
+
+  revalidatePath(
+    `/tournament?tournamentId=${tournamentId}&categoryId=${categoryId}`
+  );
+  redirect(`/tournament?tournamentId=${tournamentId}&categoryId=${categoryId}`);
 }

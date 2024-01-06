@@ -9,25 +9,31 @@ export const formatDate = (date: Date) => {
   const formattedHours = hours < 10 ? `0${hours}` : hours;
   const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
 
-  const formattedDate = `${formattedDay}/${formattedMonth}/${year} ${formattedHours}:${formattedMinutes}`;
-  return formattedDate;
+  const dateFormatted = `${formattedDay}/${formattedMonth}/${year} ${formattedHours}:${formattedMinutes}`;
+  return dateFormatted;
 };
 
-export const getDateStringFromTimestamp = (fecha: Date) => {
-  const año = fecha.getFullYear();
-  const mes = `0${fecha.getMonth() + 1}`.slice(-2); // Sumar 1 porque los meses van de 0 a 11
+export const getDateStringFromTimestamp = (fecha: Date | undefined) => {
+  if (!fecha) {
+    return "";
+  }
+  const year = fecha.getFullYear();
+  const month = `0${fecha.getMonth() + 1}`.slice(-2);
   const dia = `0${fecha.getDate()}`.slice(-2);
 
-  // Formatear la fecha para el input type date
-  const fechaFormateada = `${año}-${mes}-${dia}`;
-  return fechaFormateada;
+  // Format date for input type date
+  const dateFormatted = `${year}-${month}-${dia}`;
+  return dateFormatted;
 };
 
-export const getTimeStringFromTimestamp = (fecha: Date) => {
-  const horas = `0${fecha.getHours()}`.slice(-2);
-  const minutos = `0${fecha.getMinutes()}`.slice(-2);
+export const getTimeStringFromTimestamp = (fecha: Date | undefined) => {
+  if (!fecha) {
+    return "";
+  }
+  const hours = `0${fecha.getHours()}`.slice(-2);
+  const minutes = `0${fecha.getMinutes()}`.slice(-2);
 
-  // Formatear la hora para el input type time
-  const horaFormateada = `${horas}:${minutos}`;
-  return horaFormateada;
+  // Format time for input type time
+  const hourFormatted = `${hours}:${minutes}`;
+  return hourFormatted;
 };
