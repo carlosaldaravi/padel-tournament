@@ -9,7 +9,7 @@ const Player = async ({
   searchParams?: { categoryId: string };
 }) => {
   const categories = await getCategories();
-  const category = searchParams?.categoryId || "";
+  const category = searchParams?.categoryId || categories[0].id;
 
   return (
     <Page title="Lista de jugadores">
