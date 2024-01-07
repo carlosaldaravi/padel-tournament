@@ -76,7 +76,7 @@ export default function LoginForm() {
               </>
             </div>
           )}
-          <Link href={"/player/create"}>
+          <Link href={"/players/create"}>
             <button
               type="button"
               className="w-full block rounded-md bg-blue-500 px-3 py-2 text-center

@@ -9,7 +9,7 @@ export function CreatePlayer({
 }) {
   return (
     <Link
-      href={`/player/create?categoryId=${categoryIdSelected}`}
+      href={`/players/create?categoryId=${categoryIdSelected}`}
       className="flex justify-center h-10 items-center rounded-lg bg-blue-600 px-4 font-medium text-white transition-colors hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
     >
       Crear jugador
@@ -20,7 +20,7 @@ export function CreatePlayer({
 export function UpdatePlayer({ id }: { id: string }) {
   return (
     <Link
-      href={`/player/${id}/edit`}
+      href={`/players/${id}/edit`}
       className="w-10 flex justify-center rounded-md border p-2 hover:bg-gray-100"
     >
       <PencilIcon className="w-5" />

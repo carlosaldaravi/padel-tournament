@@ -156,8 +156,8 @@ export async function createPlayer(
     };
   }
   // Revalidate the cache for the invoices page and redirect the user.
-  revalidatePath(`/player?categoryId=${categoryId}`);
-  redirect(`/player?categoryId=${categoryId}`);
+  revalidatePath(`/players?categoryId=${categoryId}`);
+  redirect(`/players?categoryId=${categoryId}`);
 }
 
 export async function updatePlayer(
@@ -212,8 +212,8 @@ export async function updatePlayer(
     return { message: "Database Error: Failed to Update Player." };
   }
 
-  revalidatePath(`/player?categoryId=${categoryId}`);
-  redirect(`/player?categoryId=${categoryId}`);
+  revalidatePath(`/players?categoryId=${categoryId}`);
+  redirect(`/players?categoryId=${categoryId}`);
 }
 export async function updateMatch(
   prevState: State,
@@ -267,7 +267,7 @@ export async function deletePlayer(id: string) {
 
   try {
     await deletePlayerFromDB(id);
-    revalidatePath("/player");
+    revalidatePath("/players");
     return { message: "Jugador eliminado" };
   } catch (error) {
     return { message: "Database Error: Failed to Delete Player." };

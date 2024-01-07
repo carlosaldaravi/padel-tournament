@@ -170,7 +170,7 @@ export default function Form({ categories }: { categories: CategoryType[] }) {
       </div>
       <div className="mt-6 flex items-center justify-end gap-x-6">
         <Link
-          href={`/player`}
+          href={`/players`}
           className="text-sm font-semibold leading-6 text-white"
         >
           Cancelar

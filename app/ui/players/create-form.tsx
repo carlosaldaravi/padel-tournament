@@ -268,7 +268,7 @@ export default function Form({
       </div>
       <div className="mt-6 flex items-center justify-end gap-x-6">
         <Link
-          href={`/player?categoryId=${categorySelected}`}
+          href={`/players?categoryId=${categorySelected}`}
           className="text-sm font-semibold leading-6 text-white"
         >
           Cancelar
