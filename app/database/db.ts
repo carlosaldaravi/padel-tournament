@@ -30,6 +30,17 @@ export const getClub = async (): Promise<ClubType> => {
     client.release();
   }
 };
+export const getClubs = async (): Promise<ClubType[]> => {
+  const client = await pool.connect();
+
+  try {
+    const result = await client.query("SELECT * FROM club");
+
+    return result.rows;
+  } finally {
+    client.release();
+  }
+};
 
 export const getCategories = async (): Promise<CategoryType[]> => {
   const client = await pool.connect();
@@ -425,7 +436,7 @@ export const addMatchToDb = async (
   }
 };
 
-export const editMatchFromDB = async (playerData: Partial<MatchType>) => {
+export const editMatchFromDB = async (matchData: Partial<MatchType>) => {
   const client = await pool.connect();
 
   try {
@@ -437,13 +448,60 @@ export const editMatchFromDB = async (playerData: Partial<MatchType>) => {
         WHERE id = $5
       `,
       [
-        playerData.result,
-        playerData.court,
-        playerData.date,
-        playerData.winners,
-        playerData.id,
+        matchData.result,
+        matchData.court,
+        matchData.date,
+        matchData.winners,
+        matchData.id,
       ]
     );
+
+    if (matchData.winners) {
+      const nextMatch = await client.query(
+        `
+          SELECT 
+            m.id,
+            CASE WHEN EXISTS (SELECT 1 FROM match_players WHERE match_id = m.id) THEN true ELSE false END AS is_opponent
+          FROM match m
+          JOIN tournament_has_matchs thm ON m.id = thm.match_id
+          LEFT JOIN match_players mp ON m.id = mp.match_id
+          WHERE m.phase = (SELECT phase / 2 FROM match WHERE id = $1)
+            AND thm.tournament_id = (SELECT tournament_id FROM tournament_has_matchs WHERE match_id = $1)
+            AND thm.category_id = (SELECT category_id FROM tournament_has_matchs WHERE match_id = $1)
+            AND (mp.match_id IS NULL OR (SELECT COUNT(*) FROM match_players WHERE match_id = m.id) < 3)
+          GROUP BY m.id
+          ORDER BY COUNT(mp.match_id) DESC;
+        `,
+        [matchData.id]
+      );
+      console.log("rowCount: ", nextMatch.rowCount);
+      if (nextMatch.rowCount && nextMatch.rowCount > 0) {
+        const players = await client.query(
+          `
+          SELECT mp.player_id
+          FROM match_players mp
+          LEFT JOIN match m ON m.id = mp.match_id
+          WHERE mp.match_id = $1
+          AND (
+            ($2 = 'locals' AND mp.is_opponent = false)
+            OR ($2 = 'opponents' AND mp.is_opponent = true)
+            );        
+            `,
+          [matchData.id, matchData.winners]
+        );
+        for (const player of players.rows) {
+          await client.query(
+            'INSERT INTO "match_players" (id, match_id, player_id, is_opponent) VALUES ($1, $2, $3, $4) RETURNING id',
+            [
+              uuidv4(),
+              nextMatch.rows[0].id,
+              player.player_id,
+              nextMatch.rows[0].is_opponent,
+            ]
+          );
+        }
+      }
+    }
 
     return result.rows[0];
   } catch (error) {
