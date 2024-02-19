@@ -1,16 +1,20 @@
 "use client";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
-import { CategoryType } from "@/app/lib/definitions";
+import { CategoryType, LevelOfCategoryType } from "@/app/lib/definitions";
 import { CreatePlayer } from "../ui/players/buttons";
 
 const PlayerTable = ({
   categoryIdSelected,
+  levelIdSelected,
   categories,
+  levels,
   children,
 }: {
   categoryIdSelected: string;
+  levelIdSelected: string;
   categories: CategoryType[];
+  levels: LevelOfCategoryType[];
   children: React.ReactNode;
 }) => {
   const router = useRouter();
@@ -51,10 +55,30 @@ const PlayerTable = ({
           </option>
           {categories.map((category) => (
             <option key={`category-id-${category.id}`} value={category.id}>
-              Categoría {category.name}
+              {category.name}
             </option>
           ))}
         </select>
+        <div className="">
+          <select
+            defaultValue={levelIdSelected}
+            onChange={(e) => handleCategorySelected(e.target.value)}
+            required
+            id="level"
+            name="level"
+            autoComplete="level-name"
+            className="block w-full p-2 rounded-md border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6 [&_*]:text-black"
+          >
+            <option value="" disabled>
+              Selecciona una categoría
+            </option>
+            {levels.map((level) => (
+              <option key={`level-id-${level.id}`} value={level.id}>
+                {level.level}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
       <div className="flow-root">
         <div className="overflow-x-auto">

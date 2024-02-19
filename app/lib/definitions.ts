@@ -1,10 +1,18 @@
+export enum ClubRoleEnum {
+  ADMIN = "admin",
+  EMPLOYEE = "employee",
+}
+
 export type ClubType = {
   id: string;
   name: string;
+  users?: UserType[];
+  userHasRole: ClubRoleEnum[];
 };
 export type CategoryType = {
   id: string;
   name?: string;
+  levels?: LevelOfCategoryType[];
 };
 
 export type PlayerType = {
@@ -30,6 +38,7 @@ export type UserType = {
   email: string;
   password?: string;
   admin?: boolean;
+  club?: ClubType | null;
 };
 export type UserForm = {
   id?: string;
@@ -63,6 +72,13 @@ export type CategoryOfTournamentType = {
   name?: string;
   stages: StageType[];
   winners: string[];
+  levels: LevelOfCategoryType[];
+};
+
+export type LevelOfCategoryType = {
+  id: string;
+  level?: string;
+  order?: number;
 };
 
 export type TournamentType = {

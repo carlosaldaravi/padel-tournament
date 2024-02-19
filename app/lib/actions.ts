@@ -69,11 +69,23 @@ const MatchFormSchema = z.object({
   time: z.string(),
 });
 
+const RegisterFormSchema = z.object({
+  firstName: z.string(),
+  lastName: z.string().nullable(),
+  email: z.string().email({
+    message: "Por favor, escribe un email válido.",
+  }),
+  password: z.string(),
+  password2: z.string(),
+  clubName: z.string(),
+});
+
 const CreatePlayer = PlayerFormSchema.omit({ id: true, userId: true });
 const UpdatePlayer = PlayerFormSchema.omit({ id: true });
 const CreateTournament = TournamentFormSchema.omit({});
 const CreateCuople = CoupleFormSchema.omit({});
 const UpdateMatch = MatchFormSchema.omit({});
+const CreateUserWithClub = RegisterFormSchema.omit({});
 
 export type State = {
   errors?: {
@@ -387,4 +399,44 @@ export async function assignCoupleToTournament(
     `/tournament?tournamentId=${tournamentId}&categoryId=${categoryId}`
   );
   redirect(`/tournament?tournamentId=${tournamentId}&categoryId=${categoryId}`);
+}
+
+export async function createUserWithClub(
+  prevState: State,
+  formData: FormData
+): Promise<State> {
+  try {
+    const validatedFields = CreateUserWithClub.safeParse({
+      firstName: formData.get("firstName"),
+      lastName: formData.get("lastName"),
+      email: formData.get("email"),
+      password: formData.get("password"),
+      password2: formData.get("password2"),
+      clubName: formData.get("clubName"),
+    });
+    if (!validatedFields.success) {
+      console.log(
+        "validatedFields.error.flatten().fieldErrors: ",
+        validatedFields.error.flatten().fieldErrors
+      );
+
+      return {
+        errors: validatedFields.error.flatten().fieldErrors,
+        message: "Completa los campos obligatorios.",
+      };
+    }
+
+    const { firstName, lastName, password, clubName } = validatedFields.data;
+
+    const response = await addCoupleToDB(
+      firstName,
+      lastName!,
+      password,
+      clubName
+    );
+  } catch (error) {
+    return { message: "Database Error: Failed to Delete Player." };
+  }
+  revalidatePath(`/`);
+  redirect(`/`);
 }

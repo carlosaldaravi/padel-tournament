@@ -10,6 +10,7 @@ import {
   TournamentType,
   UserType,
   UserCredentialsType,
+  LevelOfCategoryType,
 } from "@/app/lib/definitions";
 
 const pool = new Pool({
@@ -47,6 +48,38 @@ export const getCategories = async (): Promise<CategoryType[]> => {
 
   try {
     const result = await client.query("SELECT * FROM category ORDER BY name");
+
+    return result.rows;
+  } finally {
+    client.release();
+  }
+};
+
+export const getLevels = async (): Promise<LevelOfCategoryType[]> => {
+  const client = await pool.connect();
+
+  try {
+    const result = await client.query("SELECT * FROM level ORDER BY level");
+
+    return result.rows;
+  } finally {
+    client.release();
+  }
+};
+export const getCategoriesLevels = async (): Promise<CategoryType[]> => {
+  const client = await pool.connect();
+
+  try {
+    const result = await client.query(
+      `
+        SELECT
+          l.level, c.name, cl.id
+        FROM category_level cl
+        INNER JOIN category c ON c.id = cl.category_id
+        INNER JOIN level l ON l.id = cl.level_id
+        ORDER BY c.name, l.order
+      `
+    );
 
     return result.rows;
   } finally {
@@ -601,6 +634,8 @@ export const getTournament = async (
       [tournamentId]
     );
 
+    console.log("result: ", result);
+
     let currentTournament!: TournamentType;
     let locals = [];
     let opponents = [];
@@ -685,6 +720,7 @@ export const getTournament = async (
         ?.matches.find((m) => m.id === local.matchId)
         ?.opponents.push(local.name);
     });
+    console.log("currentTournament: ", currentTournament);
 
     currentTournament.categories.forEach((c) => {
       c.stages.sort((b, a) => a.phase - b.phase);
@@ -693,5 +729,22 @@ export const getTournament = async (
     return currentTournament;
   } finally {
     client.release();
+  }
+};
+
+export const createUserWithClub = async (userData: any) => {
+  const client = await pool.connect();
+  try {
+    const userId = uuidv4();
+    const result = await client.query(
+      'INSERT INTO "user" (id, email, password) VALUES ($1, $2, $3) RETURNING id',
+      [userId, userData.email, "123456"]
+    );
+    await client.query(
+      'INSERT INTO "club" (id, name) VALUES ($1, $2) RETURNING id',
+      [uuidv4(), userData.club.id]
+    );
+  } catch (error) {
+    console.log(error);
   }
 };

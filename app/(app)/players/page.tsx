@@ -1,19 +1,33 @@
 import Page from "@/app/ui/Page";
 import PlayerList from "@/app/components/PlayerList";
 import PlayerTable from "@/app/components/PlayerTable";
-import { getCategories } from "@/app/database/db";
+import {
+  getCategories,
+  getCategoriesLevels,
+  getLevels,
+} from "@/app/database/db";
 
 const Player = async ({
   searchParams,
 }: {
-  searchParams?: { categoryId: string };
+  searchParams?: { categoryId: string; levelId: string };
 }) => {
   const categories = await getCategories();
+  const levels = await getLevels();
+  const cLevels = await getCategoriesLevels();
+  console.log("cLevels: ", cLevels);
+
   const category = searchParams?.categoryId || categories[0].id;
+  const level = searchParams?.levelId || levels[0].id;
 
   return (
     <Page title="Lista de jugadores">
-      <PlayerTable categories={categories} categoryIdSelected={category}>
+      <PlayerTable
+        categories={categories}
+        levels={levels}
+        categoryIdSelected={category}
+        levelIdSelected={level}
+      >
         <PlayerList categoryId={category} />
       </PlayerTable>
     </Page>

@@ -24,7 +24,7 @@ export default function LoginForm() {
         <div className="w-full">
           <div>
             <label
-              className="mb-3 mt-5 block text-xs font-medium text-gray-900"
+              className="mb-3 mt-5 block font-medium text-gray-900"
               htmlFor="email"
             >
               Email
@@ -43,7 +43,7 @@ export default function LoginForm() {
           </div>
           <div className="mt-4">
             <label
-              className="mb-3 mt-5 block text-xs font-medium text-gray-900"
+              className="mb-3 mt-5 block font-medium text-gray-900"
               htmlFor="password"
             >
               Contraseña
@@ -76,7 +76,7 @@ export default function LoginForm() {
               </>
             </div>
           )}
-          <Link href={"/players/create"}>
+          <Link href={"/clubs/create"}>
             <button
               type="button"
               className="w-full block rounded-md bg-blue-500 px-3 py-2 text-center
@@ -84,7 +84,7 @@ export default function LoginForm() {
             focus-visible:outline focus-visible:outline-2
             focus-visible:outline-offset-2 focus-visible:outline-blue-600"
             >
-              Registrarme en torneo
+              Crear mi club
             </button>
           </Link>
         </div>
@@ -97,7 +97,10 @@ function LoginButton() {
   const { pending } = useFormStatus();
 
   return (
-    <Button className="w-full flex justify-center gap-4" aria-disabled={pending}>
+    <Button
+      className="w-full flex justify-center gap-4"
+      aria-disabled={pending}
+    >
       Entrar <ArrowRightIcon className="h-5 w-5 text-gray-50" />
     </Button>
   );

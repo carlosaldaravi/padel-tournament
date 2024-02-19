@@ -14,32 +14,34 @@ const Tournament = async ({
   const players = await getCouplesByCategory(categoryId);
 
   return (
-    <div className="mx-12 h-full w-full">
-      <div className="flex items-center gap-4">
+    <>
+      <div className="w-full">
         <CategoryTournamentSelect
           catSelected={categoryId}
           tournament={tournament}
         />
       </div>
-      <div className="h-full w-full p-4 snap-x flex items-start gap-16">
-        {/* TODO: only show to admin */}
-        <CouplesNotAssign
-          tournamentId={tournament.id}
-          categoryId={categoryId}
-          players={players}
-        />
-        {tournament.categories
-          .find((c) => c.id === categoryId)
-          ?.stages.map((stage, index) => (
-            <Stage
-              key={stage.id}
-              matches={stage.matches}
-              round={(index + 1).toString()}
-              phase={stage.phase}
-            />
-          ))}
+      <div className="mx-12 h-full w-full">
+        <div className="h-full w-full p-4 snap-x flex items-start gap-16">
+          {/* TODO: only show to admin */}
+          <CouplesNotAssign
+            tournamentId={tournament.id}
+            categoryId={categoryId}
+            players={players}
+          />
+          {tournament.categories
+            .find((c) => c.id === categoryId)
+            ?.stages.map((stage, index) => (
+              <Stage
+                key={stage.id}
+                matches={stage.matches}
+                round={(index + 1).toString()}
+                phase={stage.phase}
+              />
+            ))}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

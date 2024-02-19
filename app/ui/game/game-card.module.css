@@ -1,7 +1,7 @@
 .card {
-  min-width: 15rem;
+  min-width: 16rem;
   width: fit-content;
-  min-height: 15rem;
+  min-height: 16rem;
   height: fit-content;
   position: relative;
   display: flex;
